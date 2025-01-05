@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Selection</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gift-selection {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .gift {
+            width: 90px;
+            height: 130px;
+            background-color: #333;
+            border: 2px solid #333;
+            border-radius: 10px;
+            margin: 0 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        .gift img {
+            width: 100%;
+            height: 80%;
+            object-fit: cover;
+        }
+
+        .gift p {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .gift.active {
+            border-color: #007BFF;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            background-color: #333;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .button.active {
+            background-color: #1E90FF;
+        }
+
+        .instruction {
+            background-color: #222;
+            border-radius: 10px;
+            padding: 10px; /* Уменьшили отступы */
+            margin-top: 20px;
+            width: 80%; /* Уменьшили ширину */
+            max-width: 450px; /* Уменьшили максимальную ширину */
+            text-align: left;
+            line-height: 1.4; /* Немного уменьшили межстрочный интервал */
+            font-size: 14px; /* Уменьшили размер шрифта */
+        }
+
+        .images {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .images img {
+            width: 230px; /* Увеличена ширина на 50% */
+            height: 330px; /* Увеличена высота на 50% */
+            border-radius: 15px;
+            margin: 0 10px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            display: none;
+        }
+
+        .modal a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .modal a:hover {
+            text-decoration: underline;
+        }
+
+        .ok-button {
+            background-color: #1E90FF;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .ok-button:hover {
+            background-color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="gift-selection">
+        <div class="gift" data-price="12">
+            <img src="cup.gif" alt="Коктейль">
+            <p>Любые</p>
+        </div>
+        <div class="gift" data-price="16">
+            <img src="gold_ring.gif" alt="Кольцо">
+            <p>Любые</p>
+        </div>
+        <div class="gift" data-price="90">
+            <img src="pepe.gif" alt="Лягушка Пепе">
+            <p>Любые</p>
+        </div>
+        <div class="gift" data-price="170">
+            <img src="durov_cap.gif" alt="Кепка Дурова">
+            <p>Любые</p>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button id="transfer-button" class="button" disabled>Выберите подарок</button>
+        <button id="confirm-button" class="button" disabled>Я передал</button>
+    </div>
+
+    <div class="instruction">
+        <h3>⚙️ Инструкция</h3>
+        <p>1. Выберите один из подарков и нажмите на него</p>
+        <p>2. Нажмите кнопку "Передать"</p>
+        <p>3. Зайдите на свой профиль Telegram > нажмите на свой подарок > изменить > впишите @asteroalex > нажмите передать (см. скриншоты)</p>
+        <p>4. После передачи подарка нажмите кнопку "Я передал"</p>
+        <p>5. Сделайте скриншот с появившимся окном и отправьте его @AsteroAlex</p>
+    </div>
+
+    <div class="images">
+        <img src="owner.jpg" alt="Изменить владельца">
+        <img src="transfer.jpg" alt="Передача подарка">
+    </div>
+
+    <div class="modal" id="modal">
+        <p>✅ Ваш номер заявки: #<span id="request-number"></span></p>
+        <p>Свяжитесь с администратором <a href="https://t.me/AsteroAlex" target="_blank">@AsteroAlex</a> и отправьте ему скриншот с этим окном</p>
+        <button class="ok-button" id="ok-button">ОК</button>
+    </div>
+
+    <div class="modal" id="transfer-modal">
+        <p>Вы успешно выбрали подарок!</p>
+        <p>Отправьте ваш подарок на этот аккаунт: @AsteroAlex, после чего нажмите кнопку "Я передал"</p>
+        <p>Если не умеете отправлять подарки - читайте инструкцию</p>
+        <button class="ok-button" id="transfer-ok-button">ОК</button>
+    </div>
+
+    <script>
+        const gifts = document.querySelectorAll('.gift');
+        const transferButton = document.getElementById('transfer-button');
+        const confirmButton = document.getElementById('confirm-button');
+        const modal = document.getElementById('modal');
+        const transferModal = document.getElementById('transfer-modal');
+        const requestNumberSpan = document.getElementById('request-number');
+        const transferRequestNumberSpan = document.getElementById('request-number'); // Исправил на правильный элемент
+        const okButton = document.getElementById('ok-button');
+        const transferOkButton = document.getElementById('transfer-ok-button');
+
+        let selectedGift = null;
+
+        gifts.forEach(gift => {
+            gift.addEventListener('click', () => {
+                gifts.forEach(g => g.classList.remove('active'));
+                gift.classList.add('active');
+                selectedGift = gift;
+                const price = gift.getAttribute('data-price');
+                transferButton.textContent = `Передать за ${price}$`;
+                transferButton.disabled = false;
+                transferButton.classList.add('active');
+                confirmButton.disabled = true;
+                confirmButton.classList.remove('active');
+            });
+        });
+
+        transferButton.addEventListener('click', () => {
+            window.open("https://t.me/AsteroAlex", "_blank");
+            confirmButton.disabled = false;
+            confirmButton.classList.add('active');
+        });
+
+        confirmButton.addEventListener('click', () => {
+            confirmButton.classList.remove('active');
+            confirmButton.disabled = true;
+            const requestNumber = Math.floor(1000 + Math.random() * 9000);
+            requestNumberSpan.textContent = requestNumber;
+            modal.style.display = 'block';
+        });
+
+        okButton.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        transferOkButton.addEventListener('click', () => {
+            transferModal.style.display = 'none';
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        transferModal.addEventListener('click', (e) => {
+            if (e.target === transferModal) {
+                transferModal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
